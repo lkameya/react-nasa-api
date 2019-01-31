@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import './App.css';
 
-const API = 'https://hn.algolia.com/api/v1/search?query=';
-const DEFAULT_QUERY = 'redux';
+const API = 'https://api.nasa.gov/planetary/apod';
 
 export const doIncrement = prevState => ({
   counter: prevState.counter + 1,
@@ -13,26 +12,34 @@ export const doDecrement = prevState => ({
   counter: prevState.counter - 1,
 });
 
+
 class App extends Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      hits: [],
+      explanation: '',
+      imageURL: '',
       isLoading: false,
-      teste: false,
       error: null,
     };
   }
 
-  getStories = async () => {
+  getPictureOfTheDay = async () => {
     this.setState({ isLoading: true });
     try {
-      const result = await axios.get(API + DEFAULT_QUERY)
-      console.log(result);
+      const result = await axios.get(API, {
+        params: {
+          date: '2019-01-01',
+          hd: false,
+          api_key: 'w0D7qmlrDGhEWRsPK2mgEeZhWhBqYEzsY9q8HUhV'
+        }
+      });
       this.setState({
-        hits: result.data.hits,
+        explanation: result.data.explanation,
+        imageURL: result.data.url,
+        title: result.data.title,
         isLoading: false
       });
     }
@@ -45,11 +52,11 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.getStories();
+    this.getPictureOfTheDay();
   }
 
   render() {
-    const { hits, isLoading, error } = this.state;
+    const { explanation, imageURL, title, isLoading, error } = this.state;
 
     if (error) {
       return <p>{error.message}</p>;
@@ -60,13 +67,11 @@ class App extends Component {
     }
 
     return (
-      <ul>
-        {hits.map(hit =>
-          <li key={hit.objectID}>
-            <a href={hit.url}>{hit.title}</a>
-          </li>
-        )}
-      </ul>
+      <div>
+        <h2>{title}</h2>
+        <img src={imageURL} alt="APOD" width="600px" height="500px" />
+        {explanation}
+      </div>
     );
   }
 }
