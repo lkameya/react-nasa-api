@@ -19,7 +19,7 @@ it('should increment the counter in state', () => {
 it('should decrement the counter in state', () => {
   const state = { counter: 0 };
   const newState = doDecrement(state);
-
+  m
   expect(newState.counter).toEqual(-1);
 });
 

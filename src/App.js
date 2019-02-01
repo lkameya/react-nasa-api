@@ -4,34 +4,26 @@ import './App.css';
 
 const API = 'https://api.nasa.gov/planetary/apod';
 
-export const doIncrement = prevState => ({
-  counter: prevState.counter + 1,
-});
-
-export const doDecrement = prevState => ({
-  counter: prevState.counter - 1,
-});
-
-
 class App extends Component {
-
   constructor(props) {
     super(props);
 
     this.state = {
       explanation: '',
       imageURL: '',
+      date: new Date(),
       isLoading: false,
       error: null,
     };
   }
 
   getPictureOfTheDay = async () => {
+    const { date } = this.state;
     this.setState({ isLoading: true });
     try {
       const result = await axios.get(API, {
         params: {
-          date: '2019-01-01',
+          date: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
           hd: false,
           api_key: 'w0D7qmlrDGhEWRsPK2mgEeZhWhBqYEzsY9q8HUhV'
         }
@@ -40,7 +32,8 @@ class App extends Component {
         explanation: result.data.explanation,
         imageURL: result.data.url,
         title: result.data.title,
-        isLoading: false
+        isLoading: false,
+        date: new Date(date.setDate(date.getDate() - 1))
       });
     }
     catch (e) {
@@ -49,29 +42,38 @@ class App extends Component {
         isLoading: false
       })
     }
+    finally {
+      setTimeout(() => {
+        this.getPictureOfTheDay()
+      }, 5000)
+    }
   }
 
   componentDidMount() {
     this.getPictureOfTheDay();
   }
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
   render() {
-    const { explanation, imageURL, title, isLoading, error } = this.state;
+    const { explanation, imageURL, title, error } = this.state;
 
     if (error) {
       return <p>{error.message}</p>;
     }
 
-    if (isLoading) {
-      return <p>Loading ...</p>;
-    }
-
     return (
-      <div>
-        <h2>{title}</h2>
-        <img src={imageURL} alt="APOD" width="600px" height="500px" />
-        {explanation}
-      </div>
+      <main>
+        <h2 className="title">{title}</h2>
+        <div className="box-image ">
+          <img src={imageURL} alt="APOD" height="500px" />
+        </div>
+        <div className="description">
+          {explanation}
+        </div>
+      </main>
     );
   }
 }
