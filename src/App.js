@@ -4,14 +4,20 @@ import './App.css';
 
 const API = 'https://api.nasa.gov/planetary/apod';
 
+const randomDate = (start, end) => {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
 
+    this.synth = window.speechSynthesis;
+
     this.state = {
       explanation: '',
       imageURL: '',
-      date: new Date(),
+      date: randomDate(new Date(2017, 0, 1), new Date()),
       isLoading: false,
       error: null,
     };
@@ -33,8 +39,10 @@ class App extends Component {
         imageURL: result.data.url,
         title: result.data.title,
         isLoading: false,
-        date: new Date(date.setDate(date.getDate() - 1))
+        date: randomDate(new Date(2017, 0, 1), new Date())//new Date(date.setDate(date.getDate() - 1))
       });
+
+      this.readText(this.state.explanation);
     }
     catch (e) {
       this.setState({
@@ -44,8 +52,9 @@ class App extends Component {
     }
     finally {
       setTimeout(() => {
-        this.getPictureOfTheDay()
-      }, 5000)
+        this.synth.cancel();
+        this.getPictureOfTheDay();
+      }, 60000)
     }
   }
 
@@ -57,16 +66,24 @@ class App extends Component {
     clearInterval(this.interval);
   }
 
+  readText(text) {
+    const chunks = text.split('.');
+    for (let chunk of chunks) {
+      let utterThis = new SpeechSynthesisUtterance(chunk);
+      utterThis.voice = this.synth.getVoices()[5];
+      this.synth.speak(utterThis);
+    }
+  }
+
   render() {
     const { explanation, imageURL, title, error } = this.state;
-
     if (error) {
       return <p>{error.message}</p>;
     }
 
     return (
       <main>
-        <h2 className="title">{title}</h2>
+        <h1 className="title">{title}</h1>
         <div className="box-image ">
           <img src={imageURL} alt="APOD" height="500px" />
         </div>

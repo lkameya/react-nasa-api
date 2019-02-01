@@ -1,5 +1,6 @@
 body {
-  font-family: 'Titillium Web', sans-serif
+  font-family: 'Titillium Web', sans-serif;
+  background-color: black;
 }
 .heading {
   font-weight: 700;

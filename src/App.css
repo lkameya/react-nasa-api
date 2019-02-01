@@ -1,5 +1,6 @@
 main {
   background-color: black;
+  padding: 30px;
 }
 
 .box-image {
@@ -7,6 +8,7 @@ main {
   justify-content: center;
   background-color: black;
   color: white;
+  padding: 50px;
 }
 
 .title {
@@ -16,5 +18,8 @@ main {
 
 .description {
   color:white;
+  font-size: 20px;
+  padding: 0 10vh;
+  text-align: justify;
 }
 
